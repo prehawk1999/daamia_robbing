@@ -4,6 +4,7 @@ import base64
 import requests
 import json
 from conf import conf as cf
+from base64 import b64encode
 
 param = {}
 param['softwareId'] = '8108'
@@ -16,7 +17,11 @@ def check_points(param):
     r = requests.post('https://v2-api.jsdama.com/check-points', data = json.dumps(param))
     print(json.loads(r.content.decode('utf8')))
 
-def decode_reCaptcha(img_b64):
+def decode_reCaptchaBase64Str(img_b64):
+    param['softwareId'] = '8108'
+    param['softwareSecret'] = cf.yanzheng_sk
+    param['username'] = cf.yanzheng_user
+    param['password'] = cf.password
     param['captchaType'] = 1101
     param['captchaMinLength'] = 5
     param['captchaMaxLength'] = 5
@@ -26,6 +31,9 @@ def decode_reCaptcha(img_b64):
     r = requests.post(url, data = json.dumps(param))
     return json.loads(r.content.decode('utf8'))
 
+def decode_reCaptchaBytes(b):
+    img_b64 = b64encode(b)
+    return decode_reCaptchaBase64Str(img_b64.decode('ascii'))
 
 if __name__ == '__main__':
     url = 'https://v2-api.jsdama.com/upload'

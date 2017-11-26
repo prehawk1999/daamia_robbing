@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html" charset="utf-8" />
+    <title>VFS : Registered Login</title>
+
+    <link href="/Global-Appointment/Content/CMS-Styles/css/style.css" rel="stylesheet"/>
+
+    <link href="/Global-Appointment/Content/CMS-Styles/css/jquery.selectBox.css" rel="stylesheet"/>
+
+    <link href="/Global-Appointment/Content/CMS-Styles/css/SpryAccordion.css" rel="stylesheet"/>
+
+    <link href="/Global-Appointment/Content/CMS-Styles/css/jqtransform.css" rel="stylesheet"/>
+
+    <link href="/Global-Appointment/Content/themes/base/jquery.ui.all.css" rel="stylesheet"/>
+
+    <link href="/Global-Appointment/Content/CMS-Styles/css/bootstrap.min.css" rel="stylesheet"/>
+
+    <link href="/Global-Appointment/Content/CMS-Styles/css/bootstrap-theme.min.css" rel="stylesheet"/>
+
+    <link href="/Global-Appointment/Content/CMS-Styles/css/bootstrap-datetimepicker.min.css" rel="stylesheet"/>
+
+    <link href="/Global-Appointment/Content/CMS-Styles/css/jquery.countdown.css" rel="stylesheet"/>
+
+
+
+
+
+
+
+
+
+    <script src="/Global-Appointment/Scripts/jquery-1.11.3.min.js"></script>
+
+    <script src="/Global-Appointment/Content/CMS-Styles/js/jquery.selectBox.js"></script>
+
+    <script src="/Global-Appointment/Content/CMS-Styles/js/SpryAccordion.js"></script>
+
+    <script src="/Global-Appointment/Content/CMS-Styles/js/jquery.jqtransform.js"></script>
+
+    <script src="/Global-Appointment/Content/CMS-Styles/js/bootstrap.min.js"></script>
+
+    <script src="/Global-Appointment/Content/CMS-Styles/js/bootstrap-datetimepicker.min.js"></script>
+
+
+
+    <link href="/Global-Appointment/Content/App-Styles/css/jquery.modalbox.css" rel="stylesheet"/>
+
+    <script src="/Global-Appointment/Scripts/jquery-migrate-1.2.1.js"></script>
+
+    <script src="/Global-Appointment/Scripts/jquery.modalbox-1.5.0-min.js"></script>
+
+    <script src="/Global-Appointment/Scripts/jquery.magnific-popup.min.js"></script>
+
+    <script src="/Global-Appointment/Scripts/jquery.countdown.js"></script>
+
+
+
+
+
+    <style type="text/css">
+        #header-title {
+            display: none;
+        }
+
+        .help {
+            width: 30px;
+            float: right;
+            margin-right: 8px;
+        }
+
+        li {
+            list-style: none;
+        }
+    </style>
+
+
+
+    <script type="text/javascript">
+        function noBack() { window.history.forward(); }
+        $.ajaxSetup({ cache: false });
+        $(document).ready(function () {
+
+
+            $('.input_capital').on('input', function (evt) {
+                $(this).val(function (_, val) {
+                    return val.toUpperCase();
+                });
+            });
+
+            //number only
+            function isNumber(evt) {
+                evt = (evt) ? evt : window.event;
+                var charCode = (evt.which) ? evt.which : evt.keyCode;
+                // if (charCode == 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
+                if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+                    return false;
+                }
+
+                return true;
+            }
+
+            $(".only_number").keypress(function (e) {
+                //if the letter is not digit then display error and don't type anything
+                if (e.which != 8 && e.which != 0 && (e.which < 48 || e.which > 57)) {
+                    //display error message
+                    $("#errmsg").html("Digits Only").show().fadeOut("slow");
+                    return false;
+                }
+            });
+
+            $(".openDialog").on("click", function (e) {
+                e.preventDefault();
+
+                $("<div></div>")
+                    .addClass("dialog")
+                    .attr("id", $(this)
+                        .attr("data-dialog-id"))
+                    .appendTo("body")
+                    .dialog({
+                        title: $(this).attr("data-dialog-title"),
+                        close: function () { window.location.reload(); },
+                        modal: true,
+                        width: 1036,
+                        height: 420,
+                        left: 0
+
+                    })
+                    .load(this.href);
+
+            });
+
+            //$(".close").live("click", function (e) {
+            //    e.preventDefault();
+            //    $(this).closest(".dialog").dialog("close");
+            //});
+        });
+
+
+    </script>
+
+    <style type="text/css" id="antiClickjack">
+        body {
+            display: none !important;
+        }
+    </style>
+    <script type="text/javascript">
+        if (self === top) {
+            var antiClickjack = document.getElementById("antiClickjack");
+            antiClickjack.parentNode.removeChild(antiClickjack);
+        } else {
+            top.location = self.location;
+        }
+    </script>
+
+</head>
+
+<body onload="noBack();">
+    <!--wrapper starts here-->
+
+    <!-- header starts here -->
+    <div class="header">
+        <div class="wrapper">
+            <div class="logo" title="vfs global complaint management system" style="margin-left: 0px;"></div>
+            <a href="http://www.vfsglobal.com/" target="_blank"></a>
+
+            <div class="header-title" id="header-title" style="float: right; margin-right: 13px;">
+                <span>Apply for VISA to
+                    <img src="/Global-Appointment/content/cms-styles/images/missionimage.png" style="margin: 0 7px; vertical-align: -5px; border: 2px solid #fff" />
+                    india</span>
+            </div>
+
+
+
+
+
+
+            <!-- Modal -->
+
+        </div>
+    </div>
+
+
+
+    <!-- header ends here -->
+    <!-- main container starts here -->
+    <div class="wrapper">
+        <div class="main-container">
+
+
+            <a class="openmodalbox" href="javascript:void(0);" title="Demo - Show hidden content (span.modalboxContent)">
+                <img class="help" style="cursor: pointer" title="help" src="/Global-Appointment/Content/App-Styles/images/help.png" />
+                <span class="modalboxContent">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myModalLabel">Help</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>
+  <b>1.Schedule an appointment:</b>To schedule an appointment use Schedule an appointment link on the left menu. Scheduling an appointment involves following steps:
+</p>
+<ul>
+  <li>a.    Select Mission (option available only for CC User. For Individual /TA’s this option is disabled.)</li>
+  <li>b.    Select Country (option available only for CC User. For Individual /TA’s this option is disabled.)</li>
+  <li>c.    Select location : Center can be visa application center (VAC), Embassy</li>
+  <li>d.    Select Visa Category</li>
+  <li>e.    Click on “Continue” button to go to Applicant List Page. </li>
+  <li>f.    Applicant list: Initially applicant list will be empty. Login User need to add applicant/s before he/she proceed with appointment date selection. </li>
+  <li>g.    Date & time slot selection: After adding applicant/s, on click of continue, user will be taken to final calendar page where user will see appointment dates (in green) and holidays (in red).</li>
+  <li>h.    User can select the date and time slot and confirm.</li>
+  <li>i.    Appointment confirmation: Click on “Confirm” button in the final calendar page</li>
+  <li>j.    An email & SMS will be triggered to the applicant/s after appointment is confirmed. </li>
+</ul>
+<p>
+  <b>2. Reschedule an appointment:</b> To reschedule an appointment, user need to have the reference number with valid future appointment. User can click on “reschedule an appointment” link.
+</p>
+<ul>
+  <li>a.    Enter the reference number and click on submit to get the applicant/s details</li>
+  <li>b.    User can select the applicant/s to reschedule and click on continue to proceed to final calendar to select date & time</li>
+  <li>c.    Upon selection date & time, can confirm the appointment by clicking confirm button.</li>
+  <li>d.    Appointment confirmation message will be displayed</li>
+  <li>e.    An email & SMS will be triggered to the applicant/s</li>
+</ul>
+<p>
+  <b>3. Cancel an Appointment:</b> To cancel an appointment, user need to have the reference number with valid future appointment. User can click on “Cancel an appointment” link.
+</p>
+<ul>
+  <li>a.    Enter the reference number and click on submit to get the applicant/s details</li>
+  <li>b.    User can select the applicant/s to cancel and click on continue.</li>
+  <li>c.    Appointment cancellation confirmation message will be displayed</li>
+  <li>d.    An email & SMS will be triggered to the applicant/s</li>
+</ul>
+<p>
+  <b>4. Print or Email Appointment Letter:</b>  To print an appointment letter, user need to have the reference number with valid future appointment. User can click on “Print an appointment” link.
+</p>
+<ul>
+  <li>a.    Enter the reference number and click on submit to get the applicant/s details</li>
+  <li>b.    User can select the applicant/s to print and click on “Download appointment letter” button.</li>
+  <li>c.    An email & SMS will be triggered to the applicant</li>
+
+</ul>
+<p>
+  <b>5. Retrieve Incomplete Appointment:</b>  To retrieve an incomplete appointment, user need to have the reference number. User can click on “Retrieve Incomplete appointment” link.
+</p>
+<ul>
+  <li>d.    Enter the reference number and click on submit to get the applicant/s details</li>
+  <li>e.    Login User can also add applicant/s before he/she proceed with appointment date selection.</li>
+  <li>f.    User can select the applicant/s to schedule and click on continue to proceed to final calendar to select date & time</li>
+  <li>g.    Upon selection date & time, can confirm the appointment by clicking confirm button.</li>
+  <li>h.    Appointment confirmation message will be displayed</li>
+  <li>i.    An email & SMS will be triggered to the applicant/s</li>
+
+</ul>
+                    </div>
+                </span>
+            </a>
+
+            <!-- left panel starts here -->
+
+            <div id="sidebar" class="leftpanel">
+
+            </div>
+            <!-- left panel ends here -->
+
+
+
+<style>
+    #sidebar, .timezonediv .leftpanel {
+        width: 0px;
+        border-right: 0px;
+    }
+
+    a {
+        color: #000;
+    }
+    /*.tooltip {
+    width:130px;
+    }*/
+</style>
+    <div style="text-align: right; padding: 10px;"><span class="mandatory" style="top: -3px;">*</span>Mandatory Fields</div>
+    <div style="float: right;">
+
+        <div class="mandatory-txt" style="padding-top: 10px;">
+            <div class="" style="float: right;">
+                <span class="tooltip-content">Select Language :</span>
+                <select class="select-btn" data-val="true" data-val-number="The field LanguageId must be a number." data-val-required="The LanguageId field is required." id="LanguageId" name="LanguageId" style="height: 25px;border-radius: 5px;"><option value="0">Select Language :</option>
+<option value="22">Albanian</option>
+<option value="21">Arabic</option>
+<option value="19">Armenian</option>
+<option value="18">Bahasa</option>
+<option value="24">Brazil</option>
+<option value="8">Chinese</option>
+<option value="12">Czech</option>
+<option value="14">Dutch</option>
+<option selected="selected" value="1">English</option>
+<option value="10">French</option>
+<option value="3">Georgia</option>
+<option value="4">German</option>
+<option value="13">Greek</option>
+<option value="6">Japanese</option>
+<option value="17">Korean</option>
+<option value="15">Polish</option>
+<option value="16">Portuguese</option>
+<option value="2">Russian</option>
+<option value="23">Serbian</option>
+<option value="9">Spanish</option>
+<option value="11">Thai</option>
+<option value="5">Turkish</option>
+<option value="7">Ukrainian</option>
+</select>
+            </div>
+
+        </div>
+    </div>
+
+<div class="SubContainer">
+        <h1>Appointment Login </h1>
+        <h1 style="margin-top: 31px; font-size: 21px">If this is the first time you are using this service, Please click on new user.</h1>
+        <div class="frm-container">
+
+            <div id="result"></div>
+
+
+
+<form action="/Global-Appointment/" autocomplete="off" id="ApplicantListForm" method="post"><input name="__RequestVerificationToken" type="hidden" value="cfUA5NKaz6h-iDQlFGRqQcIHq4_F6S_eeQTm3Hjqbcmkzvytft0h5LG08EQJF9CsbFkfsu7Tb-vCDsb8b8XOQhj3apo1" /><input id="Mission" name="Mission" type="hidden" value="" /><input id="Country" name="Country" type="hidden" value="" /><input id="Center" name="Center" type="hidden" value="" /><input data-val="true" data-val-required="The IsGoogleCaptchaEnabled field is required." id="IsGoogleCaptchaEnabled" name="IsGoogleCaptchaEnabled" type="hidden" value="False" /><input id="reCaptchaURL" name="reCaptchaURL" type="hidden" value="https://www.google.com/recaptcha/api/siteverify?secret={0}&amp;response={1}" /><input id="reCaptchaPublicKey" name="reCaptchaPublicKey" type="hidden" value="6Ld-Kg8UAAAAAK6U2Ur94LX8-Agew_jk1pQ3meJ1" />                <div class="frm-element-div">
+                    <div class="frm-label">
+                        <label class="control-label" for="EmailId">Email ID</label>
+                        <span class="mandatory">*</span>
+                    </div>
+                    <div class="frm-element">
+                        <input autocomplete="off" class="form-control small-input_field" data-val="true" data-val-length="Email shouldn&#39;t exceed 50 characters" data-val-length-max="50" data-val-required="Required" id="EmailId" name="EmailId" placeholder="Email ID" type="text" value="" />
+                        <span class="field-validation-valid" data-valmsg-for="EmailId" data-valmsg-replace="true"></span>
+
+                    </div>
+
+                </div>
+                <div class="frm-element-div">
+                    <div class="frm-label">
+                        <label class="control-label" for="Password">Password</label>
+                        <span class="mandatory">*</span>
+                    </div>
+                    <div class="frm-element">
+                        <input autocomplete="off" class="form-control small-input_field" data-val="true" data-val-length="Password shouldn&#39;t exceed 128 characters" data-val-length-max="128" data-val-required="Required" id="Password" name="Password" placeholder="Password" type="password" />
+                        <span class="field-validation-valid" data-valmsg-for="Password" data-valmsg-replace="true"></span>
+                    </div>
+                </div>
+                    <div class="frm-element-div">
+                        <div class="customcapcha">
+
+<script type="text/javascript">
+$(function () {$('#d737208097fc489d9b3968fb975cc5fa').show();});
+function ______318f7a651fca4012ab0cbe2e5f7884ee________() { $('#d737208097fc489d9b3968fb975cc5fa').hide(); $.post("/Global-Appointment/DefaultCaptcha/Refresh", { t: $('#CaptchaDeText').val() }, function(){$('#d737208097fc489d9b3968fb975cc5fa').show();}); return false; }</script>
+<br/>
+<img id="CaptchaImage" src="/Global-Appointment/DefaultCaptcha/Generate?t=d188e552f9b047c586a2cb70aea0f202"/><input id="CaptchaDeText" name="CaptchaDeText" type="hidden" value="d188e552f9b047c586a2cb70aea0f202" /> <br/><a href="#CaptchaImage" id="d737208097fc489d9b3968fb975cc5fa" onclick="______318f7a651fca4012ab0cbe2e5f7884ee________()" style="display:none;">Refresh</a><br/>Enter the text shown in image<br/><input autocomplete="off" autocorrect="off" data-val="true" data-val-required="Is required field." id="CaptchaInputText" name="CaptchaInputText" type="text" value="" /><br/>
+
+                        </div>
+                    </div>
+                <div class="frm-button">
+                    <input type="submit" value="Continue" class="submitbtn" />
+                </div>
+</form>            <div class="frm-element-div">
+                <div class="frm-element" style="width: 100%;">
+                    <a Style="margin-right:20px;" href="/Global-Appointment/Account/ForgotPassword">Forgot Password?</a>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <a href="/Global-Appointment/Account/RegisterUser?Length=7" id="NewUser">New User?</a>
+
+
+                </div>
+                <div class="frm-element">
+
+
+                </div>
+            </div>
+            <div class="frm-element-div" style="text-align: center; margin-top: 20px;">
+                <p>Disclaimer : The registration will expire after 30 inactive days from the last appointment date.</p>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+            <div id="loading" style="display: none;"></div>
+            <img src="/Global-Appointment/Content/App-Styles/images/cube.gif" alt="Please wait ..." class="loaderImg" style="display: none;"/>
+
+        </div>
+        <div class="timezonediv">
+            <div class="leftpanel" style="min-height: 117px; width: 25.22%;"></div>
+            <!-- Added Partial view for timezone added by santosh-->
+            <style type="text/css">
+    .timezone {
+        width: 330px;
+        float: right;
+        border: 4px solid #968585;
+        padding: 10px;
+    }
+
+        .timezone p {
+            margin: 0px 0px 0px 0px;
+            font-weight: bold;
+            color: black;
+            text-align: left;
+        }
+
+    .timezonediv {
+        background: #FAF9F9;
+        /* display: table-row; */
+        height: 117px;
+        border-right: 1px solid #9A8F8F;
+        border-left: 1px #9A8F8F solid;
+    }
+</style>
+<div class="timezone">
+    <p></p>
+    <p></p>
+    <p></p>
+    <div id="countdown">
+    </div>
+    <p id="note"></p>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var _language = 0;
+
+        $.ajax({
+            type: 'POST',
+            url: '/Global-Appointment/Home/DownTimeDetails', //  calling json method
+            data: { languageId: _language },
+            dataType: "json",
+            success: function (data) { //ajax call
+                if (data != "") {
+                    SetCountDown(data.DownTimeDetails);
+                }
+                else {
+                    $(".timezone").css("display", "none");
+                }
+            }
+        });
+    });
+
+    function SetCountDown(data) {
+        if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+
+            var str = data.DownTimeDateTime;
+            data.DownTimeDateTime = str.split(".").join("/");
+        }
+        $(".timezone p:nth-of-type(1)").html('The Next System Maintenance Details.');
+        $(".timezone p:nth-of-type(2)").html(String.format('Start Time: {0} GMT', data.DownDateTime));
+        $(".timezone p:nth-of-type(3)").html(String.format('Est. End Time: {0} GMT', data.UpDateTime));
+        $("#countdown").html('Count Down' + ' | ');
+        var note = $('#note'),
+            ts = new Date(Date.parse(data.DownTimeDateTime)),
+            newYear = true;
+
+        if ((new Date()) > ts) {
+            // The new year is here! Count towards something else.
+            // Notice the *1000 at the end - time must be in milliseconds
+            ts = (new Date()).getTime() + 10 * 24 * 60 * 60 * 1000;
+
+            newYear = false;
+        }
+
+        $('#countdown').countdown({
+            timestamp: ts,
+            callback: function (days, hours, minutes, seconds) {
+                var message = "";
+                message += days + ' day(s)' + ", ";
+                message += hours + ' hour(s)' + ", ";
+                message += minutes + ' minute(s)' + ' and ';
+                message += seconds + ' second(s)' + " <br />";
+                if (days == 0 & hours == 0 & minutes == 0 & seconds == 0) {
+                    $(".timezone").css("display", "none");
+                }
+                note.html(message);
+            }
+        });
+    }
+
+    String.format = function () {
+        // The string containing the format items (e.g. "{0}")
+        // will and always has to be the first argument.
+        var theString = arguments[0];
+
+        // start with the second argument (i = 1)
+        for (var i = 1; i < arguments.length; i++) {
+            // "gm" = RegEx options for Global search (more than one instance)
+            // and for Multiline search
+            var regEx = new RegExp("\\{" + (i - 1) + "\\}", "gm");
+            theString = theString.replace(regEx, arguments[i]);
+        }
+
+        return theString;
+    }
+
+</script>
+
+
+        </div>
+        <div id="footer">
+
+                <div>
+
+                    <span style="float: left; padding-left: 10px; padding-top: 9px;">VFS Global Services Limited</span>
+                    <p style="text-align: right; padding-right: 10px; padding-top: 9px">Application version 8.2 and Site Supports IE 10 and above, Mozila, Google Chrome and Safari</p>
+                </div>
+
+        </div>
+        <!-- main container ends here -->
+        <!-- footer starts here -->
+        <!-- footer ends here -->
+    </div>
+    <!--wrapper ends here-->
+
+
+
+
+        <script src="/Global-Appointment/bundles/jqueryval?v=HcLE6qkuZgjbDIR9vNK6uI1FR3Ue8mPLMRUxn2jgJdE1"></script>
+
+
+
+
+        <script type="text/javascript">
+
+            $(document).ready(function () {
+                var lan = "en";
+                var selectedLanguage = '1';
+                // alert(selectedLanguage);
+                $.ajax({
+                    type: 'POST',
+                    url: "/Global-Appointment/Account/GetLanguageCode",
+                    data: { LanguageId: selectedLanguage },
+                    cache: false,
+                    success: function (data) {
+                        //alert(data);
+                        var s = document.createElement("script");
+                        s.type = "text/javascript";
+                        s.src = "https://www.google.com/recaptcha/api.js?hl=" + data;
+                        //alert(s.src);
+                        // Use any selector
+                        $("head").append(s);
+                    },
+                    failure: function (data) {
+                        var s = document.createElement("script");
+                        s.type = "text/javascript";
+                        s.src = "https://www.google.com/recaptcha/api.js?hl=en";
+                        //alert(s.src);
+                        // Use any selector
+                        $("head").append(s);
+                    }
+                });
+
+
+
+            });
+
+
+            var message = "Are you sure you want to change the language!? You will lose the data entered if you like to continue!";
+            $(document).ready(function () {
+                var selectedLanguage = '1';
+                if (selectedLanguage.length > 0) {
+                    $("#LanguageId").val(selectedLanguage);
+                }
+
+                $("#LanguageId").change(function (e) {
+                    var isConfirmed = confirm(message);//"Are you sure you want to change the language!? You will loose the data entered if you like to continue!");
+                    if (isConfirmed) {
+                        setculture = $(this).val();
+                        $.post('/Global-Appointment/Account/SetCurlture', { curlturename: setculture }, function (data) {
+                            location.reload(true);
+                        });
+                    } else {
+                        $("#LanguageId").val(selectedLanguage);
+                        e.preventDefault();
+                        return false;
+                    }
+                });
+
+
+
+            });
+
+
+        </script>
+
+
+
+        <script type="text/javascript">
+
+
+            $(function () {
+
+                $(document).ajaxStart(function () {
+                    $("#loading").attr("style", "position:absolute; z-index: 1000; top: 0px; " +
+                        "left:0px; text-align: center; display:none; background-color: #ddd; " +
+                        "height: 100%; width: 100%; /* These three lines are for transparency " +
+                        "in all browsers. */-ms-filter:\"progid:DXImageTransform.Microsoft.Alpha(Opacity=50)\";" +
+                        " filter: alpha(opacity=50); opacity:.5; position:fixed;");
+
+                    $("img.loaderImg").attr("style", "position:absolute; top:50%; left:50%; z-index:5000;").show();
+                    $("#loading").show();
+                })
+                    .ajaxStop(function () {
+                        $("#loading").removeAttr("style");
+                        $("img.loaderImg").removeAttr("style").hide();
+                        $("#loading").hide();
+                    });
+
+
+                $("form").on("submit", function (e) {
+
+                    if ((typeof event !== 'undefined' && event.defaultPrevented) || e.isDefaultPrevented()) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        return false;
+                    }
+
+
+                    $("#loading").attr("style", "position:absolute; z-index: 5000; top: 0px; " +
+                        "left:0px; text-align: center; display:none; background-color: #ddd; " +
+                        "height: 100%; width: 100%; /* These three lines are for transparency " +
+                        "in all browsers. */-ms-filter:\"progid:DXImageTransform.Microsoft.Alpha(Opacity=50)\";" +
+                        " filter: alpha(opacity=50); opacity:.5;position : fixed;");
+
+                    $("img.loaderImg").attr("style", "position:absolute; top:50%; left:50%; z-index:5000;").show();
+                    $("#loading").show();
+
+                });
+
+            });
+        </script>
+        <!-- DATE Formatting converts 12121990 => 12/12/1990 on focus-out  -->
+        <script type="text/javascript">
+            (function ($) {
+                'use strict';
+                var Globalconfig = {
+                    seperator: '/'
+                };
+
+                $.fn.formatToDate = function (config) {
+                    var $this = this;
+
+                    $.each($this, function () {
+
+                        var $$this = $(this),
+                            cnfg = config || Globalconfig;
+
+                        $$this.on('keydown', function (evt) {
+
+                            var value = $$this.val(),
+                                splitArry = [];
+
+                            splitArry = value.split("");
+
+                            if (!(splitArry.length < 10 && isNumeric(evt) || isDeleteOp(evt)) && !isTabOp(evt)) {
+                                evt.preventDefault();
+                            }
+                        });
+
+                        $$this.on('keyup', function (e) {
+
+                            var textSoFar = $(this).val();
+                            if (e.keyCode != 191) {
+                                if (e.keyCode != 8) {
+                                    if (textSoFar.length == 2 || textSoFar.length == 5) {
+                                        $(this).val(textSoFar + "/");
+                                    }
+                                        //to handle copy & paste of 8 digit
+                                    else if (e.keyCode == 86 && textSoFar.length == 8) {
+                                        $(this).val(textSoFar.substr(0, 2) + "/" + textSoFar.substr(2, 2) + "/" + textSoFar.substr(4, 4));
+                                    }
+                                } else {
+                                    //backspace would skip the slashes and just remove the numbers
+                                    if (textSoFar.length == 5) {
+                                        $(this).val(textSoFar.substring(0, 4));
+                                    } else if (textSoFar.length == 2) {
+                                        $(this).val(textSoFar.substring(0, 1));
+                                    }
+                                }
+                            } else {
+                                //remove slashes to avoid 12//01/2014
+                                $(this).val(textSoFar.substring(0, textSoFar.length - 1));
+                            }
+
+                        });
+
+                        return $this;
+
+
+                        //private functions
+
+                        function isNumeric(e) {
+                            return (e.keyCode >= 48 && e.keyCode <= 57) || (e.keyCode >= 96 && e.keyCode <= 105);
+                        }
+
+                        function isDeleteOp(e) {
+                            return (e.keyCode === 46 || e.keyCode === 8);
+                        }
+
+                        function isTabOp(e) {
+                            return e.keyCode === 9 || e.keyCode === 191 || e.keyCode === 37 || e.keyCode === 39;
+                        }
+                    });
+
+                };
+
+            }(jQuery));
+        </script>
+        <script type="text/javascript">
+            (function () {
+                $(function () {
+                    $('.auto-format-date').formatToDate();
+                }); //jquery wrapper
+            }()); //IIFE
+        </script>
+
+
+    <!-- GOOGLE ANALYTICS CODE  -->
+    <script type="text/javascript">
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date(); a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-69459092-1', 'auto');
+        ga('send', 'pageview');
+
+
+        $(document).ready(function () {
+
+            $('.customcapcha').find('br').remove();
+
+            $(".customcapcha a").html('<img src="/Global-Appointment/Images/refresh.png" />');
+
+            $('.customcapcha input').addClass("form-control small-input_field");
+            $('.customcapcha input').css("width", "200px");
+        });
+
+    </script>
+
+
+</body>
+</html>
+
