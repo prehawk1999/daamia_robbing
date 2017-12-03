@@ -12,6 +12,8 @@ import json
 import urllib
 from conf import conf as cf
 import codecs
+from form import applicant2, applicant1
+import time
 
 
 class WebLoader:
@@ -88,7 +90,7 @@ class WebLoader:
             return reca['data']['recognition']
                 
     
-    def postJson(self, url, pydict, token):
+    def postFormDataJson(self, url, pydict, token):
         url = self.extractUrl(url)
         print('postJson : ' + url)
         
@@ -96,25 +98,21 @@ class WebLoader:
         head['__RequestVerificationToken'] = token
         
         data = urllib.parse.urlencode(pydict)
-        print(head)
-        print(data)
         r = self.sess.post(url, data=data, headers=head)
         if r.status_code == 200:
             return r.json()
                 
-    def getJson(self, url):
+    def getQueryDataJson(self, url, token):
         url = self.extractUrl(url)
-        print('getJson : ' + url)
+        print('postJson : ' + url)
         
         head = self.modifyHeaders(self.json_headers)
-        head['__RequestVerificationToken'] = requestToken
+        head['__RequestVerificationToken'] = token
         
         r = self.sess.get(url, headers=head)
-        
         if r.status_code == 200:
-            print(self.previous_url)
-            print(len(r.content))
             return r.json()
+                
         
     def getHtmlSoup(self, url):
         url = self.extractUrl(url)
@@ -129,8 +127,7 @@ class WebLoader:
             return BeautifulSoup(r.content, 'lxml')
         
     
-    
-    def postFormDataSoup(self, url, pydict, follow=True):
+    def postFormDataSoup(self, url, pydict):
         url = self.extractUrl(url)
         print('postFormDataSoup : ' + url)
         
@@ -143,11 +140,11 @@ class WebLoader:
             return BeautifulSoup(r.content, 'lxml')
             
 
-
 def main():
     
-
-
+    ###############################
+    ###未登录态, 验证码输入, 登录
+    ##############################
     web = WebLoader()
     soup = web.getHtmlSoup('https://online.vfsglobal.com/Global-Appointment/')
     path = soup.find(id='CaptchaImage')
@@ -172,22 +169,36 @@ def main():
     title = home_soup.find(name='title').text
     print(title)
     
+    
+    
+    ############################################
+    ### 选择签证类型, 出发地点, 准备进入候选人添加
+    ############################################
     def filterSelectVAC(node):
         return node.has_attr('href') and node.text.startswith('Schedule Appointment')
 
     vac = home_soup.find(filterSelectVAC)
+    vac_url = vac['href']
+    if not vac_url:
+        print('selectVAC not found')
+        return
     
     # selectVAC
-    vac_soup = web.getHtmlSoup(vac['href'])
+    vac_soup = web.getHtmlSoup(vac_url)
     token = vac_soup.find(name='input').attrs['value']
     
+    # 富信息json
+    infoJson = vac_soup.find(id='MissionCountryLocationJSON')
+    info = json.loads(infoJson.attrs['value'])
+    print(info)
+
     check_area_url = 'https://online.vfsglobal.com/Global-Appointment/Account/CheckSeatAllotment'
     check_form = {}
     check_form['countryId'] = '11'
     check_form['missionId'] = '22'
     check_form['LocationId'] = '160'
     check_form['Location'] = 'Australia Visa Application Centre-Beijing'
-    areaInfo = web.postJson(check_area_url, check_form, token)
+    areaInfo = web.postFormDataJson(check_area_url, check_form, token)
     print(areaInfo)
 
     visa_cate_url = 'https://online.vfsglobal.com/Global-Appointment/Account/GetEarliestVisaSlotDate'
@@ -196,11 +207,107 @@ def main():
     visa_form['missionId'] = '22'
     visa_form['LocationId'] = '160'
     visa_form['VisaCategoryId'] = '418'
-    visaInfo = web.postJson(visa_cate_url, visa_form, token)
+    visaInfo = web.postFormDataJson(visa_cate_url, visa_form, token)
     print(visaInfo)
-    return web
-
+    
+    vac_form = {}
+    vac_form['__RequestVerificationToken'] = token
+    vac_form['paraMissionId'] = 22
+    vac_form['paramCountryId'] = 11
+    vac_form['paramCenterId'] = ''
+    vac_form['MissionCountryLocationJSON'] = infoJson.attrs['value']
+    vac_form['MissionId']
+    vac_form['CountryId']
+    vac_form['LocationId']
+    vac_form['LocationId']
+    vac_form['VisaCategoryId']
+    vac_form['AppointmentType']
+    applicant_soup = web.postFormDataSoup(vac_url, vac_form)
+    print(len(applicant_soup))
+    
+    
+    
+    ###########################################
+    ### 进入添加候选人页面, 添加多个候选人
+    ###########################################
+    def filterAddApplicant(node):
+        return node.has_attr('href') and node.attrs['href'].startswith('/Global-Appointment/Applicant/AddApplicant')
+    
+    add_page = applicant_soup.find(filterAddApplicant)
+    
+    add_page_soup = web.getHtmlSoup(add_page)
+    
+    add_url = 'https://online.vfsglobal.com/Global-Appointment/Applicant/AddApplicant'
+    
+    web.postFormDataSoup(add_url, applicant1)
+    final_soup = web.postFormDataSoup(add_url, applicant2)
+    
+    submit_token = final_soup.find(name='input').attrs['value']
+    
+    # 提交候选人
+    submit_applicant_url = 'https://online.vfsglobal.com/Global-Appointment/Applicant/ApplicantList'
+    submit_form = {}
+    submit_form['__RequestVerificationToken'] = submit_token
+    submit_form['URN'] = final_soup.find(id='URN').attrs['value']
+    submit_form['EnablePaymentGatewayIntegration'] = 'False'
+    submit_form['IsVAFValidationEnabled'] = 'False'
+    submit_form['IsEndorsedChildChecked'] = '0'
+    submit_form['NoOfEndorsedChild'] = '0'
+    submit_form['IsEndorsedChild'] = '0'
+    calendar_soup = web.postFormDataSoup(submit_applicant_url, submit_form)
+    
+    
+    
+    
+    
+    #############################################
+    ### 确认最终时间
+    #############################################
+    get_calendar_token = calendar_soup.find(name='input').attrs['value']
+    get_calendar_json_url = 'https://online.vfsglobal.com/Global-Appointment/Calendar/GetCalendarDaysOnViewChange'
+    query = '?month=%s&year=%s&bookingType=%s&_=%s' % (12, 2017, int(time.time()*1000))
+    web.getQueryDataJson(get_calendar_json_url + query, get_calendar_token)
+    
+    final_submit_url = 'https://online.vfsglobal.com/Global-Appointment/Calendar/FinalCalendar'
+    
+    final_form = {
+        '__RequestVerificationToken': get_calendar_token,
+        'AvailableDatesAndSlotsJSON': '[]',
+        'EncryptedSelectedAllocationId': '0iPrshRIkUUKoo3XlQeKYw==',
+        'PreviousScheduleDateTimeMessage': '',
+        'URN AUGZ542020123': '',
+        'isPaymentPageRequired': 'False',
+        'isCriteriaPageRequired': 'False',
+        'VisaCategory': 'General Visa',
+        'PurposeOfTravel': '',
+        'EnablePaymentGatewayIntegration': 'False',
+        'NumberOfApplicants': '2',
+        'applicantList.PassportNumber': '',
+        'applicantList.AURN': '',
+        'BookingcategoryType': 'General',
+        'selectedTimeBand': '0iPrshRIkUUKoo3XlQeKYw=='
+    }
+    
+    after_submit_soup = web.postFormDataSoup(final_submit_url, final_form)
+    
+    
+    ###############################################
+    ### 最终提交(能够获得电子邮件)
+    ###############################################
+    get_email_token = after_submit_soup.find(name='input').attrs['value']
+    get_email_url = 'https://online.vfsglobal.com/Global-Appointment/Payment/InitiatePayment'
+    get_email_form = {
+            '__RequestVerificationToken': get_email_token,
+            'ApplicantGroupEmail': after_submit_soup.find(id='ApplicantGroupEmail').attrs['value'],
+            'IsCountryEmailFecility': 'False',
+            'TotalAmount': '0',
+            'EnablePaymentGatewayIntegration': 'False',
+            'SurchargeFeeEnabled': 'False',
+            'CanApplicantReachoutVFS': 'false'
+    }
+    
+    last_soup = web.postFormDataSoup(get_email_url, get_email_form)
         
 if __name__ == '__main__':
-    # web = main()
+    web = main()
     pass
