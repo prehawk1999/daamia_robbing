@@ -1,61 +1,113 @@
-
-# 访问首页
-    Set-Cookie: ASP.NET_SessionId=1tlagirwhf2wwlm1uxlbhakz; path=/Global-Appointment; secure; HttpOnly
-
-Response sent 86 bytes of Cookie data:
-    Set-Cookie: ASP.NET_SessionId=1tlagirwhf2wwlm1uxlbhakz; path=/Global-Appointment; secure; HttpOnly
-
-Response sent 58 bytes of Cookie data:
-    Set-Cookie: _culture=en-US; path=/Global-Appointment; secure; HttpOnly
-
-Response sent 173 bytes of Cookie data:
-    Set-Cookie: __RequestVerificationToken_L0dsb2JhbC1BcHBvaW50bWVudA2=g1jhpOc0KlAPVsc5EzAGNkUvnBizonBOCStqaSp4XEW_TiOKlitL2buVvCP5X7yBQReRz5yKhPKIguuN40SmjOikgrw1; path=/; secure; HttpOnly
-
-Response sent 108 bytes of Cookie data:
-    Set-Cookie: BIGipServerCUST100052_wynvfsrowtweb443=rd1615o00000000000000000000ffff1eb8cb2do443; path=/; Httponly; Secure
-
-
-# 主页和验证码请求之间的可疑请求
-GET /Global-Appointment/bundles/jqueryval?v=HcLE6qkuZgjbDIR9vNK6uI1FR3Ue8mPLMRUxn2jgJdE1 HTTP/1.1
-
-
-# 请求验证码图片时带上的信息
-# t参数目前还不清楚怎么获得
-GET /Global-Appointment/DefaultCaptcha/Generate?t=d188e552f9b047c586a2cb70aea0f202 HTTP/1.1
-Accept: image/png, image/svg+xml, image/jxr, image/*;q=0.8, */*;q=0.5
-Referer: https://online.vfsglobal.com/Global-Appointment/
-Accept-Language: zh-Hans-CN,zh-Hans;q=0.8,en-US;q=0.5,en;q=0.3
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko
-Accept-Encoding: gzip, deflate
-Host: online.vfsglobal.com
-Connection: Keep-Alive
-Cookie: ASP.NET_SessionId=1tlagirwhf2wwlm1uxlbhakz; 
-_culture=en-US; 
-__RequestVerificationToken_L0dsb2JhbC1BcHBvaW50bWVudA2=g1jhpOc0KlAPVsc5EzAGNkUvnBizonBOCStqaSp4XEW_TiOKlitL2buVvCP5X7yBQReRz5yKhPKIguuN40SmjOikgrw1; 
-BIGipServerCUST100052_wynvfsrowtweb443=rd1615o00000000000000000000ffff1eb8cb2do443
-
-
+[{
+    "Id": 0,
+    "Name": "Select Visiting Country",
+    "CountryJEs": null,
+    "ChildMissionJEs": null
+},
 {
-    'CaptchaDeText': '49f21d1de2f9452cb02b98ded005379f', 
-    'EmailId': 'rosirk1@yandex.com', 
-    'Center': '', 
-    'Mission': '', 
-    'reCaptchaURL': 'https://www.google.com/recaptcha/api/siteverify?secret={0}&response={1}', 
-    'CaptchaInputText': 'NFARJ', 
-    'Password': 'Rosewood@23', 
-    'IsGoogleCaptchaEnabled': 'False', 
-    'reCaptchaPublicKey': '6Ld-Kg8UAAAAAK6U2Ur94LX8-Agew_jk1pQ3meJ1', '__RequestVerificationToken': 't8WZqK9jXytnhP-6rn5xLY-wQyjxYI8k1UEZAcQ5pmXgPH_G8kSAcLNhh_V3rEBi-2cjC5Z_6hQ1aUqJRwuHrgzj7-g1', 
-    'Country': ''
-}
-
-__RequestVerificationToken  fPjJy7V54SWazGytd1efXeQegzQ-SSVTyVQcG72sB3VHlql5XzBKgLYR_x9LRPBjSmEj3cgY-zwJpbwP329oLOjR1WI1
-Mission 
-Country 
-Center  
-IsGoogleCaptchaEnabled  False
-reCaptchaURL    https://www.google.com/recaptcha/api/siteverify?secret={0}&response={1}
-reCaptchaPublicKey  6Ld-Kg8UAAAAAK6U2Ur94LX8-Agew_jk1pQ3meJ1
-EmailId rosirk1@yandex.com
-Password    Rosewood@23
-CaptchaDeText   d2bff6e45128431481c126fe3ce0e60d
-CaptchaInputText    EDTLE
+    "Id": 22,
+    "Name": "Australia",
+    "CountryJEs": [{
+        "Locations": null,
+        "ShowDocumentCheckList": false,
+        "MissionId": 0,
+        "Id": 0,
+        "Name": "Select Residing Country"
+    },
+    {
+        "Locations": [{
+            "VisaCategories": [{
+                "Id": 0,
+                "Name": "Select Visa Category"
+            }],
+            "TypeId": 0,
+            "Id": 0,
+            "Name": "Select Centre"
+        },
+        {
+            "VisaCategories": [{
+                "Id": 0,
+                "Name": "Select Visa Category"
+            },
+            {
+                "Id": 419,
+                "Name": "Biometrics Enrolment"
+            },
+            {
+                "Id": 418,
+                "Name": "General Visa"
+            }],
+            "TypeId": 1,
+            "Id": 161,
+            "Name": "Australia Visa Application Centre - Guangzhou"
+        },
+        {
+            "VisaCategories": [{
+                "Id": 0,
+                "Name": "Select Visa Category"
+            },
+            {
+                "Id": 419,
+                "Name": "Biometrics Enrolment"
+            },
+            {
+                "Id": 418,
+                "Name": "General Visa"
+            }],
+            "TypeId": 1,
+            "Id": 160,
+            "Name": "Australia Visa Application Centre-Beijing"
+        },
+        {
+            "VisaCategories": [{
+                "Id": 0,
+                "Name": "Select Visa Category"
+            },
+            {
+                "Id": 419,
+                "Name": "Biometrics Enrolment"
+            },
+            {
+                "Id": 418,
+                "Name": "General Visa"
+            },
+            {
+                "Id": 416,
+                "Name": "Work and Holiday Visa"
+            }],
+            "TypeId": 1,
+            "Id": 163,
+            "Name": "Australia Visa Application Centre-Chengdu"
+        },
+        {
+            "VisaCategories": [{
+                "Id": 0,
+                "Name": "Select Visa Category"
+            },
+            {
+                "Id": 419,
+                "Name": "Biometrics Enrolment"
+            },
+            {
+                "Id": 418,
+                "Name": "General Visa"
+            },
+            {
+                "Id": 416,
+                "Name": "Work and Holiday Visa"
+            }],
+            "TypeId": 1,
+            "Id": 162,
+            "Name": "Australia Visa Application Centre-Shanghai"
+        }],
+        "ShowDocumentCheckList": false,
+        "MissionId": 0,
+        "Id": 11,
+        "Name": "China"
+    }],
+    "ChildMissionJEs": [{
+        "ParentMissionId": 0,
+        "Id": 0,
+        "Name": "Select Sub-Mission"
+    }]
+}]

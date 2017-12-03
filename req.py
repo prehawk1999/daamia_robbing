@@ -11,73 +11,37 @@ from lianzhong_api import decode_reCaptchaBytes
 import json
 import urllib
 from conf import conf as cf
+from webloader import WebLoader
+import codecs
 
-prefix = 'https://online.vfsglobal.com'
 
-html_headers = {
-        'Accept': 'text/html, application/xhtml+xml, image/jxr, */*',
-        'Accept-Encoding': 'gzip, deflate',
-        'Accept-Language': 'zh-Hans-CN,zh-Hans;q=0.8,en-US;q=0.5,en;q=0.3',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko'
-        }
+web = WebLoader()
 
-img_headers = {
-        'Accept': 'image/png, image/svg+xml, image/jxr, image/*;q=0.8, */*;q=0.5',
-        'Accept-Encoding': 'gzip, deflate',
-        'Accept-Language': 'zh-Hans-CN,zh-Hans;q=0.8,en-US;q=0.5,en;q=0.3',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko',
-        'Referer': 'https://online.vfsglobal.com/Global-Appointment/'
-        }
-
-login_headers = {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Referer': 'https://online.vfsglobal.com/Global-Appointment/',
-        'Cache-Control': 'no-cache',
-        'Accept': 'text/html, application/xhtml+xml, image/jxr, */*',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko'
-        }
 #%%
 
-# 建立一个session
-s = requests.Session()
-
 # 通过首页获取cookies
-r = s.get('https://online.vfsglobal.com/Global-Appointment/', headers=html_headers)
-soup = BeautifulSoup(r.content, 'lxml')
-a = soup.find(id='CaptchaImage')
-recaptcha_url = prefix + a['src']
-print('reca url : ' + recaptcha_url)
+soup = web.getHtmlSoup('https://online.vfsglobal.com/Global-Appointment/')
 
-# 通过首页的html找到验证码地址, 并且访问它
-rr = s.get(recaptcha_url, headers=img_headers)
-
-
-
-# TODO: 验证此验证码
-reca = decode_reCaptchaBytes(rr.content)
-if reca['code'] != 0:
-    print('error getting recaptcha' + reca)
-    exit(1)
-
-print('reca result : ')
-print(reca)
+path = soup.find(id='CaptchaImage')
+code = web.getReCaptchaCode(path['src'])
+print(code)
 
 # 获取__RequestVerificationToken
-token = None
-cookie_dict = r.cookies.get_dict()
-for name,value in cookie_dict.items():
-    if name.startswith('__RequestVerificationToken'):
-        token = value
+#token = None
+#cookie_dict = r.cookies.get_dict()
+#for name,value in cookie_dict.items():
+#    if name.startswith('__RequestVerificationToken'):
+#        token = value
 
-if token is None:
-    print('token not found')
-    exit(1)
+#if token is None:
+#    print('token not found')
+#    exit(1)
 
 #%%
 form = {}
-form['__RequestVerificationToken'] = soup.find(name='input').attrs['value']
+form['__RequestVerificationToken'] = soup.find(name='input').attrs['value']         # 刚好是第一个input
 form['reCaptchaPublicKey'] = soup.find(id='reCaptchaPublicKey').attrs['value']
-form['CaptchaInputText'] = reca['data']['recognition']
+form['CaptchaInputText'] = code
 form['Mission']= soup.find(id='Mission').attrs['value']
 form['Country'] = soup.find(id='Country').attrs['value']
 form['Center'] = soup.find(id='Center').attrs['value']
@@ -89,7 +53,50 @@ form['Password'] = cf.password #soup.find(id='Password').attrs['value']
 print('submit form : ', form)
 
 # POST 提交表单到主页
-rrr = s.post('https://online.vfsglobal.com/Global-Appointment/', data=urllib.parse.urlencode(form), headers=login_headers, allow_redirects=False)
-print('response status code : ', rrr.status_code)
-print('response cookie : ', rrr.cookies)
-print(rrr.content)
+home_soup = web.postFormDataSoup('https://online.vfsglobal.com/Global-Appointment/', form)
+
+
+if home_soup is None:
+    print('login failed ')
+    exit(1)
+    
+#%%
+# 找到添加预约的页面, 访问它
+def filterSelectVAC(node):
+    return node.has_attr('href') and node.text.startswith('Schedule Appointment')
+
+vac = home_soup.find(filterSelectVAC)
+
+# selectVAC
+vac_soup = web.getHtmlSoup(vac['href'])
+
+#%%
+# 1. 获取centre地区
+check_area_url = 'https://online.vfsglobal.com/Global-Appointment/Account/CheckSeatAllotment'
+areaInfo = web.getJson(check_area_url)
+
+# 2. 获取visa类型
+visa_cate_url = 'https://online.vfsglobal.com/Global-Appointment/Account/GetEarliestVisaSlotDate'
+visaInfo = web.getJson(visa_cate_url)
+
+# 获取富内容json, 通过json解析内部的表单信息
+infoJson = vac_soup.find(id='MissionCountryLocationJSON')
+info = json.loads(infoJson.attrs['value'])
+print(info)
+
+
+vac_form = {}
+vac_form['paraMissionId'] = vac_soup.find(id='paraMissionId').attrs['value']
+vac_form['paramCountryId'] = vac_soup.find(id='paramCountryId').attrs['value']
+vac_form['paramCenterId'] = vac_soup.find(id='paramCenterId').attrs['value']
+vac_form['LocationId'] = ''
+
+
+
+
+
+# 登出, 安全退出, 防止被怀疑
+# form2 = {}
+# form2['__RequestVerificationToken'] = form['__RequestVerificationToken']
+
+# r4 = s.post('https://online.vfsglobal.com/Global-Appointment/Account/LogOff', data=urllib.parse.urlencode(form2), headers=login_headers)
