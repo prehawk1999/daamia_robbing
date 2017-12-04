@@ -10,7 +10,7 @@ param = {}
 param['softwareId'] = '8108'
 param['softwareSecret'] = cf.yanzheng_sk
 param['username'] = cf.yanzheng_user
-param['password'] = cf.password
+param['password'] = cf.yanzheng_password
     
 def check_points(param):
     s = requests.session()
@@ -21,7 +21,7 @@ def decode_reCaptchaBase64Str(img_b64):
     param['softwareId'] = '8108'
     param['softwareSecret'] = cf.yanzheng_sk
     param['username'] = cf.yanzheng_user
-    param['password'] = cf.password
+    param['password'] = cf.yanzheng_password
     param['captchaType'] = 1101
     param['captchaMinLength'] = 5
     param['captchaMaxLength'] = 5
