@@ -6,14 +6,14 @@ Created on Sun Dec  3 00:20:13 2017
 """
 
 import requests
-from bs4 import BeautifulSoup
-from lianzhong_api import decode_reCaptchaBytes
 import json
 import urllib
-from conf import conf as cf
 import codecs
-from form import applicant2, applicant1
 import time
+from bs4 import BeautifulSoup
+from lianzhong_api import decode_reCaptchaBytes
+from conf import conf as cf
+from form import applicant2, applicant1
 
 
 class WebLoader:
@@ -85,7 +85,8 @@ class WebLoader:
         if r.status_code == 200:
             reca = decode_reCaptchaBytes(r.content)
             if reca['code'] != 0:
-                print('error getting recaptcha' + reca)
+                print('error getting recaptcha')
+                print(reca)
                 return
             return reca['data']['recognition']
                 
@@ -126,6 +127,8 @@ class WebLoader:
         if r.status_code == 200:
             return BeautifulSoup(r.content, 'lxml')
         
+    def getReqTokenBySoup(self, soup):
+        return soup.find(name='input').attrs['value']
     
     def postFormDataSoup(self, url, pydict):
         url = self.extractUrl(url)

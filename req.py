@@ -9,32 +9,39 @@ import time
 import json
 from conf import conf as cf
 from webloader import WebLoader
-from form import applicant2, applicant1
-
-
+from client import applicants
+from vfs import parseMissionLocJson
 
 #%%
 ###############################
 ###未登录态, 验证码输入, 登录
+###可以预先登录
 ##############################
 web = WebLoader()
 soup = web.getHtmlSoup('https://online.vfsglobal.com/Global-Appointment/')
+token = web.getReqTokenBySoup(soup)
+
 path = soup.find(id='CaptchaImage')
 code = web.getReCaptchaCode(path['src'])
 print(code)
 
 form = {}
-form['__RequestVerificationToken'] = soup.find(name='input').attrs['value']         # 刚好是第一个input
-form['reCaptchaPublicKey'] = soup.find(id='reCaptchaPublicKey').attrs['value']
-form['CaptchaInputText'] = code
-form['Mission']= soup.find(id='Mission').attrs['value']
-form['Country'] = soup.find(id='Country').attrs['value']
-form['Center'] = soup.find(id='Center').attrs['value']
-form['IsGoogleCaptchaEnabled']= soup.find(id='IsGoogleCaptchaEnabled').attrs['value']
-form['reCaptchaURL'] = soup.find(id='reCaptchaURL').attrs['value']
-form['CaptchaDeText'] = soup.find(id='CaptchaDeText').attrs['value']
-form['EmailId'] = cf.register_user # soup.find(id='EmailId').attrs['value']
-form['Password'] = cf.password #soup.find(id='Password').attrs['value']
+# 刚好是第一个input 是requestToken
+try:
+    form['__RequestVerificationToken'] = token        
+    form['reCaptchaPublicKey'] = soup.find(id='reCaptchaPublicKey').attrs['value']
+    form['CaptchaInputText'] = code
+    form['Mission']= soup.find(id='Mission').attrs['value']
+    form['Country'] = soup.find(id='Country').attrs['value']
+    form['Center'] = soup.find(id='Center').attrs['value']
+    form['IsGoogleCaptchaEnabled']= soup.find(id='IsGoogleCaptchaEnabled').attrs['value']
+    form['reCaptchaURL'] = soup.find(id='reCaptchaURL').attrs['value']
+    form['CaptchaDeText'] = soup.find(id='CaptchaDeText').attrs['value']
+    form['EmailId'] = cf.register_user # soup.find(id='EmailId').attrs['value']
+    form['Password'] = cf.password #soup.find(id='Password').attrs['value']
+except:
+    print('Register Login error')
+    
 print('submit form : ', form)
 
 home_soup = web.postFormDataSoup('https://online.vfsglobal.com/Global-Appointment/', form)
@@ -57,13 +64,15 @@ if not vac_url:
 
 # selectVAC
 vac_soup = web.getHtmlSoup(vac_url)
-token = vac_soup.find(name='input').attrs['value']
+token = web.getReqTokenBySoup(vac_soup)
 
-# 富信息json
+# TODO: 富信息json
 infoJson = vac_soup.find(id='MissionCountryLocationJSON')
 info = json.loads(infoJson.attrs['value'])
-print(info)
 
+sel = parseMissionLocJson(info, applicants[0])
+
+## 不知道有啥用1
 check_area_url = 'https://online.vfsglobal.com/Global-Appointment/Account/CheckSeatAllotment'
 check_form = {}
 check_form['countryId'] = '11'
@@ -73,6 +82,7 @@ check_form['Location'] = 'Australia Visa Application Centre-Beijing'
 areaInfo = web.postFormDataJson(check_area_url, check_form, token)
 print(areaInfo)
 
+## 不知道有啥用2
 visa_cate_url = 'https://online.vfsglobal.com/Global-Appointment/Account/GetEarliestVisaSlotDate'
 visa_form = {}
 visa_form['countryId'] = '11'
@@ -82,19 +92,22 @@ visa_form['VisaCategoryId'] = '418'
 visaInfo = web.postFormDataJson(visa_cate_url, visa_form, token)
 print(visaInfo)
 
+
+
 vac_form = {}
 vac_form['__RequestVerificationToken'] = token
-vac_form['paraMissionId'] = 22
-vac_form['paramCountryId'] = 11
+vac_form['paraMissionId'] = sel['MissionId']
+vac_form['paramCountryId'] = sel['CountryId']
 vac_form['paramCenterId'] = ''
 vac_form['MissionCountryLocationJSON'] = infoJson.attrs['value']
-vac_form['MissionId'] = 22
-vac_form['CountryId'] = 11
-vac_form['LocationId'] = 163
-vac_form['VisaCategoryId'] = 418
+vac_form['MissionId'] = sel['MissionId']
+vac_form['CountryId'] = sel['CountryId']
+vac_form['LocationId'] = sel['LocationId']
+vac_form['VisaCategoryId'] = sel['VisaCategoryId']
 vac_form['AppointmentType'] = 'StandardAppointment'
 applicant_soup = web.postFormDataSoup(vac_url, vac_form)
 print(len(applicant_soup))
+
 
 
 #%%
@@ -106,18 +119,21 @@ def filterAddApplicant(node):
 
 add_page = applicant_soup.find(filterAddApplicant)
 add_page_soup = web.getHtmlSoup(add_page['href'])
-add_page_token = add_page_soup.find(name='input').attrs['value']
+token = web.getReqTokenBySoup(add_page_soup)
 
 add_url = 'https://online.vfsglobal.com/Global-Appointment/Applicant/AddApplicant'
-applicant1['__RequestVerificationToken'] = add_page_token
-applicant2['__RequestVerificationToken'] = add_page_token
-a_soup = web.postFormDataSoup(add_url, applicant1)
-final_soup = web.postFormDataSoup(add_url, applicant2)
+apc1 = applicants[0]['form']
+apc1['__RequestVerificationToken'] = token
 
+apc2 = applicants[1]['form']
+apc2['__RequestVerificationToken'] = token
+a_soup = web.postFormDataSoup(add_url, apc1)
+final_soup = web.postFormDataSoup(add_url, apc2)
+token = web.getReqTokenBySoup(final_soup)
 
 #%%
 # 提交候选人
-final_token = final_soup.find(name='input').attrs['value']
+final_token = token
 submit_applicant_url = 'https://online.vfsglobal.com/Global-Appointment/Applicant/ApplicantList'
 submit_form = {}
 submit_form['__RequestVerificationToken'] = final_token
