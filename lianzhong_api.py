@@ -1,3 +1,4 @@
+
 # coding: utf-8
 
 import base64
@@ -46,4 +47,3 @@ if __name__ == '__main__':
     #check_points(param)
     a = decode_reCaptcha(img_b64)
     print(a)
-
