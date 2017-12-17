@@ -5,56 +5,44 @@ Created on Mon Oct 23 22:31:06 2017
 @author: prehawk
 """
 
+import time
 import json
-import codecs
-from bs4 import BeautifulSoup
+from conf import conf as cf
+from webloader import WebLoader
+from conf import client as cl
+from vfs import parseMissionLocJson
 
-
-f = codecs.open('data/vac.html', 'r', 'utf8')
-html = f.read()
-f.close()
-
-soup = BeautifulSoup(html, 'lxml')
-infoJson = soup.find(id='MissionCountryLocationJSON')
-info = json.loads(infoJson.attrs['value'])
-
-sel = {
-                'MissionId': 'Australia',
-                'CountryId': 'China',
-                'LocationId': 'Australia Visa Application Centre-Chengdu',
-                'VisaCategoryId': 'Work and Holiday Visa',
-                }
-
-
-sel_id = {}
-
-
-for i in info:
-    if not i['Name'].startswith(sel['MissionId']):
-        continue
-    
-    sel_id['MissionId'] = i['Id']
-    for c in i['CountryJEs']:
-        if not c['Name'].startswith(sel['CountryId']):
-            continue
-        
-        sel_id['CountryId']= c['Id']
-        
-        for l in c['Locations']:
-            if not l['Name'].startswith(sel['LocationId']):
-                continue
-            
-            sel_id['LocaltionId'] = l['Id']
-            
-            for v in l['VisaCategories']:
-                if not v['Name'].startswith(sel['VisaCategoryId']):
-                    continue
-                
-                sel_id['VisaCategoryId']  = v['Id']
-                
-                
-if len(sel_id) == 4:
-    print('succ!', sel_id)
+#%%
+###############################
+###未登录态, 验证码输入, 登录
+###可以预先登录
+##############################
+web = WebLoader()
+soup = web.getHtmlSoup('https://online.vfsglobal.com/Global-Appointment/')
+if soup is not None:
+    print('[MAIN] - ERR: main page http get error')
+    exit
 else:
-    print('failed!', sel_id)
-        
+    exit
+    
+
+raise Exception('exit', len(soup))
+exit(0)
+exit
+exit
+    
+print('after')
+
+exit
+exit
+exit(0)
+time.sleep(10)
+exit(0)
+
+token = web.getReqTokenBySoup(soup)
+
+path = soup.find(id='CaptchaImage')
+print('a')
+code = web.getReCaptchaCode(path['src'])
+print('b')
+#print('[MAIN] - success getting reca code : ', code)
