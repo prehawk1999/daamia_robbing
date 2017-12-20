@@ -7,11 +7,10 @@ Created on Tue Nov 21 23:15:16 2017
 
 import time
 import json
+import vfs
 from conf import conf as cf
 from webloader import WebLoader
 from conf import client as cl
-from vfs import parseMissionLocJson
-from vfs import parseGetCalendarDaysJson
 
 #%%
 ###############################
@@ -24,62 +23,46 @@ if soup is None:
     raise Exception('main page http get error')
 
 print('[MAIN] - Stage : get before login main page')
-token = web.getReqTokenBySoup(soup)
+token = vfs.getReqTokenBySoup(soup)
 
 path = soup.find(id='CaptchaImage')
 code = web.getReCaptchaCode(path['src'])
 print('[MAIN] - Stage : success getting reca code : ', code)
+   
+form = vfs.buildLoginForm(soup, code, cf.register_user, cf.password)
+if form is None:
+    raise Exception('fill login form error')
 
-form = {}
-# 刚好是第一个input 是requestToken
-try:
-    form['__RequestVerificationToken'] = token        
-    form['reCaptchaPublicKey'] = soup.find(id='reCaptchaPublicKey').attrs['value']
-    form['CaptchaInputText'] = code
-    form['Mission']= soup.find(id='Mission').attrs['value']
-    form['Country'] = soup.find(id='Country').attrs['value']
-    form['Center'] = soup.find(id='Center').attrs['value']
-    form['IsGoogleCaptchaEnabled']= soup.find(id='IsGoogleCaptchaEnabled').attrs['value']
-    form['reCaptchaURL'] = soup.find(id='reCaptchaURL').attrs['value']
-    form['CaptchaDeText'] = soup.find(id='CaptchaDeText').attrs['value']
-    form['EmailId'] = cf.register_user # soup.find(id='EmailId').attrs['value']
-    form['Password'] = cf.password #soup.find(id='Password').attrs['value']
-except:
-    raise Exception('fill login form error, token: ', token)
-    
 print('[MAIN] - Stage : success filling login form : ', form)
 
 home_soup = web.postFormDataSoup('https://online.vfsglobal.com/Global-Appointment/', form)
-title = home_soup.find(name='title').text
-if title.find('HOME PAGE') == -1:
+if not vfs.verifyPage(home_soup, 'HOME PAGE'):
     raise Exception('login failed')
 
-print('[MAIN] - Stage : success login, with title: ', title)
+print('[MAIN] - Stage : success login')
 
 
 #%%
 ############################################
 ### 选择签证类型, 出发地点, 准备进入候选人添加
 ############################################
-def filterSelectVAC(node):
-    return node.has_attr('href') and node.text.startswith('Schedule Appointment')
 
-vac = home_soup.find(filterSelectVAC)
+vac = home_soup.find(vfs.filterSelectVAC)
 vac_url = vac['href']
 if vac_url is None:
     raise Exception('selectVAC link not found')
 
 # selectVAC
 vac_soup = web.getHtmlSoup(vac_url)
-token = web.getReqTokenBySoup(vac_soup)
-if vac_soup.find(name='title').text.find('Select Centre') == -1:
+token = vfs.getReqTokenBySoup(vac_soup)
+if not vfs.verifyPage(vac_soup, 'Select Centre'):
     raise Exception('enter Schedule Appoint error')
     
 print('[MAIN] - Stage: success enter selectVAC page')
 
 infoJson = vac_soup.find(id='MissionCountryLocationJSON')
 info = json.loads(infoJson.attrs['value'])
-sel = parseMissionLocJson(info, cl.applicants[0])
+sel = vfs.parseMissionLocJson(info, cl.applicants[0])
 print('[MAIN] - Stage: success parsing mission country location json')
 
 ## 不知道有啥用1
@@ -102,20 +85,10 @@ print('[MAIN] - Stage: success parsing mission country location json')
 #visaInfo = web.postFormDataJson(visa_cate_url, visa_form, token)
 #print(visaInfo)
 
+vac_form = vfs.buildMissionForm(vac_soup, sel)
 
-vac_form = {}
-vac_form['__RequestVerificationToken'] = token
-vac_form['paraMissionId'] = sel['MissionId']
-vac_form['paramCountryId'] = sel['CountryId']
-vac_form['paramCenterId'] = ''
-vac_form['MissionCountryLocationJSON'] = infoJson.attrs['value']
-vac_form['MissionId'] = sel['MissionId']
-vac_form['CountryId'] = sel['CountryId']
-vac_form['LocationId'] = sel['LocationId']
-vac_form['VisaCategoryId'] = sel['VisaCategoryId']
-vac_form['AppointmentType'] = 'StandardAppointment'
 applicant_soup = web.postFormDataSoup(vac_url, vac_form)
-if applicant_soup.find(name='title').text.find('Applicant List') == -1:
+if not vfs.verifyPage(applicant_soup, 'Applicant List'):
     raise Exception('enter Applicant list error')
 
 print('[MAIN] - Stage: success enter applicant list')
@@ -126,18 +99,16 @@ print('[MAIN] - Stage: success enter applicant list')
 ###########################################
 ### 进入添加候选人页面, 添加多个候选人
 ###########################################
-def filterAddApplicant(node):
-    return node.has_attr('href') and node.attrs['href'].startswith('/Global-Appointment/Applicant/AddApplicant')
 
-add_page = applicant_soup.find(filterAddApplicant)
+add_page = applicant_soup.find(vfs.filterAddApplicant)
 add_page_soup = web.getHtmlSoup(add_page['href'])
-token = web.getReqTokenBySoup(add_page_soup)
-if add_page_soup.find(name='title').text.find('Add New Applicant') == -1:
+token = vfs.getReqTokenBySoup(add_page_soup)
+if not vfs.verifyPage(add_page_soup, 'Add New Applicant'):
     raise Exception('enter Add New Applicant error')
     
 print('[MAIN] - Stage: success enter Add New Applicant')
 
-
+# TODO: 多个客户进行配置
 add_url = 'https://online.vfsglobal.com/Global-Appointment/Applicant/AddApplicant'
 apc1 = cl.applicants[0]['form']
 apc1['__RequestVerificationToken'] = token
@@ -146,30 +117,21 @@ apc2 = cl.applicants[1]['form']
 apc2['__RequestVerificationToken'] = token
 
 a_soup = web.postFormDataSoup(add_url, apc1)
-if a_soup.find(name='title').text.find('Applicant List') == -1:
+if not vfs.verifyPage(a_soup, 'Applicant List'):
     raise Exception('Add Applicant error')
     
 print('[MAIN] - Stage: success Add one Applicant')
 
 final_soup = web.postFormDataSoup(add_url, apc2)
-if final_soup.find(name='title').text.find('Applicant List') == -1:
+if not vfs.verifyPage(final_soup, 'Applicant List'):
     raise Exception('Add Applicant error')
     
 print('[MAIN] - Stage: success Add one Applicant')
-token = web.getReqTokenBySoup(final_soup)
 
 #%%
 # 提交候选人
-final_token = token
 submit_applicant_url = 'https://online.vfsglobal.com/Global-Appointment/Applicant/ApplicantList'
-submit_form = {}
-submit_form['__RequestVerificationToken'] = final_token
-submit_form['URN'] = final_soup.find(id='URN').attrs['value']
-submit_form['EnablePaymentGatewayIntegration'] = 'False'
-submit_form['IsVAFValidationEnabled'] = 'False'
-submit_form['IsEndorsedChildChecked'] = '0'
-submit_form['NoOfEndorsedChild'] = '0'
-submit_form['IsEndorsedChild'] = '0'
+submit_form = vfs.buildCalendarSubmitForm(final_soup)
 calendar_soup = web.postFormDataSoup(submit_applicant_url, submit_form)
 if calendar_soup.find(name='title').text.find('Booking Appointment') == -1:
     raise Exception('enter Booking Appointment error')
@@ -181,17 +143,19 @@ print('[MAIN] - Stage: success enter Booking Appointment')
 ### 确认最终时间
 #############################################
 
-## TODO: 合理获取日历url
-get_calendar_token = calendar_soup.find(name='input').attrs['value']
+
+today_time = time.gmtime()
+get_calendar_token = vfs.getReqTokenBySoup(calendar_soup)
 get_calendar_json_url = 'https://online.vfsglobal.com/Global-Appointment/Calendar/GetCalendarDaysOnViewChange'
-query = '?month=%s&year=%s&bookingType=%s&_=%s' % (12, 2017, 'General', int(time.time()*1000))
+query = '?month=%s&year=%s&bookingType=%s&_=%s' % (today_time.tm_mon, today_time.tm_year, 'General', int(time.time()*1000))
 get_calendar_json = web.getQueryDataJson(get_calendar_json_url + query, get_calendar_token)
 if get_calendar_json is None:
     raise Exception('get calendar json error')
     
 print('[MAIN] - Stage: success getting calendar json')
 
-sel_time_band = parseGetCalendarDaysJson(get_calendar_json, cl.applicants[0])
+# TODO: 根据所有人的合理时间进行申请
+sel_time_band = vfs.parseGetCalendarDaysJson(get_calendar_json, cl.applicants[0])
 if sel_time_band is None:
     raise Exception('select time band error, config error!')
     

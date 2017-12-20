@@ -25,10 +25,83 @@ VisaCategoryId = [
 import json
 import time
 
-def parseMissionLocJson(json, sel):
+def filterAddApplicant(node):
+    return node.has_attr('href') and node.attrs['href'].startswith('/Global-Appointment/Applicant/AddApplicant')
+
+def filterSelectVAC(node):
+    return node.has_attr('href') and node.text.startswith('Schedule Appointment')
+
+def verifyPage(soup, title):
+    tit = soup.find(name='title').text
+    return tit is not None and tit.find(title) != -1
+
+def getReqTokenBySoup(self, soup):
+    return soup.find(name='input').attrs['value']
+
+def buildLoginForm(soup, reca, user, passwd):
+    try:
+        form = {}
+        form['__RequestVerificationToken'] = getReqTokenBySoup(soup)        
+        form['reCaptchaPublicKey'] = soup.find(id='reCaptchaPublicKey').attrs['value']
+        form['CaptchaInputText'] = reca
+        form['Mission']= soup.find(id='Mission').attrs['value']
+        form['Country'] = soup.find(id='Country').attrs['value']
+        form['Center'] = soup.find(id='Center').attrs['value']
+        form['IsGoogleCaptchaEnabled']= soup.find(id='IsGoogleCaptchaEnabled').attrs['value']
+        form['reCaptchaURL'] = soup.find(id='reCaptchaURL').attrs['value']
+        form['CaptchaDeText'] = soup.find(id='CaptchaDeText').attrs['value']
+        form['EmailId'] = user # soup.find(id='EmailId').attrs['value']
+        form['Password'] = passwd #soup.find(id='Password').attrs['value']
+        return form
+    except:
+        pass
+    
+    
+def buildMissionForm(soup, sel):
+    try:
+        form = {}
+        form['__RequestVerificationToken'] = getReqTokenBySoup(soup)
+        form['paraMissionId'] = sel['MissionId']
+        form['paramCountryId'] = sel['CountryId']
+        form['paramCenterId'] = ''
+        form['MissionCountryLocationJSON'] = soup.find(id='MissionCountryLocationJSON').attrs['value']
+        form['MissionId'] = sel['MissionId']
+        form['CountryId'] = sel['CountryId']
+        form['LocationId'] = sel['LocationId']
+        form['VisaCategoryId'] = sel['VisaCategoryId']
+        form['AppointmentType'] = 'StandardAppointment'
+        return form
+    except:
+        pass
+
+
+
+def buildApplicantListForm(soup, applicant_conf):
+    pass
+
+
+def buildCalendarSubmitForm(soup):
+    try:
+        form = {}
+        form['__RequestVerificationToken'] = getReqTokenBySoup(soup)
+        form['URN'] = soup.find(id='URN').attrs['value']
+        form['EnablePaymentGatewayIntegration'] = 'False'
+        form['IsVAFValidationEnabled'] = 'False'
+        form['IsEndorsedChildChecked'] = '0'
+        form['NoOfEndorsedChild'] = '0'
+        form['IsEndorsedChild'] = '0'
+        return form
+    except:
+        pass
+
+
+def buildFinalSubmitForm(soup):
+    pass
+
+def parseMissionLocJson(info, sel):
     sel_id = {}
 
-    for i in json:
+    for i in info:
         if not i['Name'].startswith(sel['MissionId']):
             continue
         

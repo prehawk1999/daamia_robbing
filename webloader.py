@@ -130,9 +130,6 @@ class WebLoader:
             return BeautifulSoup(r.content, 'lxml')
         else:
             print('[WEB] - ERR, code: ', r.status_code)
-        
-    def getReqTokenBySoup(self, soup):
-        return soup.find(name='input').attrs['value']
     
     def postFormDataSoup(self, url, pydict):
         url = self.extractUrl(url)
