@@ -4,3 +4,4 @@ data/
 conf/client.py
 pkgs/
 conf/daamia_robbing.pem
+conf/memo.md

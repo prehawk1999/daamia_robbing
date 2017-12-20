@@ -35,7 +35,7 @@ def verifyPage(soup, title):
     tit = soup.find(name='title').text
     return tit is not None and tit.find(title) != -1
 
-def getReqTokenBySoup(self, soup):
+def getReqTokenBySoup(soup):
     return soup.find(name='input').attrs['value']
 
 def buildLoginForm(soup, reca, user, passwd):
